@@ -1,0 +1,75 @@
+apiVersion: "v1"
+kind: "Pod"
+metadata:
+  annotations:
+    buildUrl: "http://jenkins.jenkins.svc.cluster.local:8080/job/test_pipeline/1/"
+    runUrl: "job/test_pipeline/1/"
+  labels:
+    jenkins/jenkins-jenkins-agent: "true"
+    jenkins/label-digest: "a03577f895d998543e1e5f6ab6bbff3b4f20513f"
+    jenkins/label: "test_pipeline_1-qxf36"
+  name: "test-pipeline-1-qxf36-z7zm8-k34tt"
+  namespace: "jenkins"
+spec:
+  containers:
+  - args:
+    - "30d"
+    command:
+    - "sleep"
+    image: "python:latest"
+    imagePullPolicy: "IfNotPresent"
+    name: "python"
+    resources:
+      limits: {}
+      requests: {}
+    tty: false
+    volumeMounts:
+    - mountPath: "/home/jenkins/agent"
+      name: "workspace-volume"
+      readOnly: false
+  - args:
+    - "30d"
+    command:
+    - "sleep"
+    image: "maven:3.8.1-jdk-8"
+    imagePullPolicy: "IfNotPresent"
+    name: "maven"
+    resources:
+      limits: {}
+      requests: {}
+    tty: false
+    volumeMounts:
+    - mountPath: "/home/jenkins/agent"
+      name: "workspace-volume"
+      readOnly: false
+  - env:
+    - name: "JENKINS_SECRET"
+      value: "********"
+    - name: "JENKINS_TUNNEL"
+      value: "jenkins-agent.jenkins.svc.cluster.local:50000"
+    - name: "JENKINS_AGENT_NAME"
+      value: "test-pipeline-1-qxf36-z7zm8-k34tt"
+    - name: "JENKINS_NAME"
+      value: "test-pipeline-1-qxf36-z7zm8-k34tt"
+    - name: "JENKINS_AGENT_WORKDIR"
+      value: "/home/jenkins/agent"
+    - name: "JENKINS_URL"
+      value: "http://jenkins.jenkins.svc.cluster.local:8080/"
+    image: "jenkins/inbound-agent:4.11-1-jdk11"
+    name: "jnlp"
+    resources:
+      limits: {}
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+    volumeMounts:
+    - mountPath: "/home/jenkins/agent"
+      name: "workspace-volume"
+      readOnly: false
+  nodeSelector:
+    kubernetes.io/os: "linux"
+  restartPolicy: "Never"
+  volumes:
+  - emptyDir:
+      medium: ""
+    name: "workspace-volume"
